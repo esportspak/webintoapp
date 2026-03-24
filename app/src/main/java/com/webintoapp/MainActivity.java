@@ -37,7 +37,7 @@ public class MainActivity extends AppCompatActivity {
         // ==========================================
 
         // Option 1: REMOTE RESOURCE (আপনার সাইটের লিঙ্ক)
-        mWebView.loadUrl("https://google.com");
+        mWebView.loadUrl("http://toffeex.wuaze.com");
 
         // Option 2: LOCAL RESOURCE (আপনার assets ফোল্ডারের index.html)
         // mWebView.loadUrl("file:///android_asset/index.html");
