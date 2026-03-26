@@ -1,10 +1,116 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Web Into App Local</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Esports PK - User Panel</title>
+    
+    <link rel="preconnect" href="https://www.gstatic.com">
+    <link rel="preconnect" href="https://esports-6c771-default-rtdb.firebaseio.com">
+
+    <script src="https://www.gstatic.com/firebasejs/9.17.1/firebase-app-compat.js" defer></script>
+    <script src="https://www.gstatic.com/firebasejs/9.17.1/firebase-database-compat.js" defer></script>
+
+    <style>
+        body { 
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; 
+            background: #f4f4f4; 
+            text-align: center; 
+            padding-top: 100px;
+            -webkit-text-size-adjust: 100%;
+            touch-action: manipulation;
+            margin: 0;
+        }
+        /* Simple Loader */
+        .loader {
+            border: 4px solid #f3f3f3;
+            border-top: 4px solid #3498db;
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            animation: spin 1s linear infinite;
+            display: inline-block;
+            margin-bottom: 20px;
+        }
+        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+
+        /* Popup Style */
+        #updatePopup {
+            display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0,0,0,0.85); z-index: 9999; justify-content: center; align-items: center;
+        }
+        .popup-content {
+            background: white; padding: 30px; border-radius: 15px; text-align: center; width: 85%; max-width: 350px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+        }
+        .update-btn {
+            background: #007bff; color: white; padding: 12px 30px; text-decoration: none;
+            border-radius: 25px; display: inline-block; margin-top: 20px; font-weight: bold;
+        }
+    </style>
 </head>
-<body style="text-align:center; font-family:sans-serif; margin-top:50px;">
-    <h2>Local HTML Loaded Successfully!</h2>
+<body>
+
+    <div id="loadingArea">
+        <div class="loader"></div>
+        <p id="checkingStatus" style="color: #666;">Checking for updates...</p>
+    </div>
+
+    <div id="updatePopup">
+        <div class="popup-content">
+            <h2 style="color: #333; margin-top: 0;">New Update!</h2>
+            <p id="updateMessage" style="color: #666;">A new version is available.</p>
+            <a href="#" id="downloadLink" class="update-btn">Update Now</a>
+        </div>
+    </div>
+
+<script>
+    window.onload = function() {
+        const currentAppVersion = "1.0"; 
+
+        const firebaseConfig = {
+            apiKey: "AIzaSyDU5klF4MnCUdDV4hAmpk1tBFSefVL2tlY",
+            authDomain: "esports-6c771.firebaseapp.com",
+            databaseURL: "https://esports-6c771-default-rtdb.firebaseio.com",
+            projectId: "esports-6c771",
+            storageBucket: "esports-6c771.firebasestorage.app",
+            messagingSenderId: "408493174454",
+            appId: "1:408493174454:web:dfb45e97c42e8837f60017"
+        };
+
+        // Initialize Firebase
+        if (!firebase.apps.length) {
+            firebase.initializeApp(firebaseConfig);
+        }
+        const database = firebase.database();
+
+        // High-speed check using .once (Faster than .on)
+        database.ref('appUpdate').once('value').then((snapshot) => {
+            const data = snapshot.val();
+            if (data && data.latestVersion !== currentAppVersion) {
+                // Update found - Show UI
+                document.getElementById('loadingArea').style.display = 'none';
+                document.getElementById('updatePopup').style.display = 'flex';
+                document.getElementById('downloadLink').href = data.updateUrl;
+                document.getElementById('updateMessage').innerText = "Version " + data.latestVersion + " is now available.";
+            } else {
+                // No update - Immediate redirect to main site
+                window.location.replace("https://esportslivepk.site/");
+            }
+        }).catch((error) => {
+            console.error("Firebase Error:", error);
+            // On error, don't keep user waiting, just redirect
+            window.location.replace("https://esportslivepk.site/");
+        });
+
+        // Safety Timeout: If Firebase takes more than 5 seconds, just redirect
+        setTimeout(() => {
+            if (document.getElementById('updatePopup').style.display !== 'flex') {
+                window.location.replace("https://esportslivepk.site/");
+            }
+        }, 5000);
+    };
+</script>
+
 </body>
 </html>
